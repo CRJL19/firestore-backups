@@ -11,7 +11,7 @@ Proyecto de la actividad sobre **estrategias de copia de seguridad NoSQL**, Base
 
 | Recurso | Enlace |
 |---|---|
-| Aplicación | `[PENDIENTE]` |
+| Aplicación | <https://stockseguro-firestore.onrender.com> |
 | Repositorio | <https://github.com/CRJL19/firestore-backups> |
 | Video | `[PENDIENTE]` |
 
@@ -150,6 +150,7 @@ Necesita `BACKUP_KEY`. `verify` borra la base de destino, así que se niega a co
 - **Dos ubicaciones, no tres.** Hay datos en Firestore y copias en GitHub. La regla 3-2-1 pediría una tercera copia, como descargar periódicamente los artifacts.
 - **Enteros y decimales.** El SDK de JavaScript no distingue `1` de `1.0`, así que un `double` entero vuelve como entero. Tampoco se conservan `createTime` ni `updateTime`, que asigna el servidor.
 - **Escrituras externas.** Una incremental no ve cambios hechos por fuera de la app. La verificación detecta los que alteran los conteos, pero una modificación externa sin cambio de conteo solo se recoge en la siguiente completa.
+- **Panel de copias.** Usa la API anónima de GitHub, que limita las consultas por IP. Si falla, el panel muestra «No disponible» y reintenta: es un problema de la vista, no de las copias.
 - **Memoria.** Cada copia se procesa completa en memoria, adecuado para miles de documentos, no para millones.
 - **GitHub Actions.** La hora programada puede retrasarse, y GitHub desactiva los programas tras 60 días sin actividad en el repositorio.
 - **Plan gratuito.** Firestore Spark permite 50 000 lecturas y 20 000 escrituras al día. La instancia gratuita de Render se duerme tras un rato sin tráfico.

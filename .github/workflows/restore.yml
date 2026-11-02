@@ -73,7 +73,7 @@ jobs:
         run: node src/backup/cli.js create --dir backups --type full --label prerestore
 
       - name: Guardar la copia previa
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backup-${{ steps.safety.outputs.id }}
           path: backups/${{ steps.safety.outputs.id }}/
