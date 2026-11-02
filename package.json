@@ -1,0 +1,28 @@
+{
+  "name": "stockseguro-firestore",
+  "version": "1.0.0",
+  "description": "Inventario sobre Firestore con estrategias automatizadas de copia de seguridad NoSQL.",
+  "private": true,
+  "license": "MIT",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "firebase emulators:exec --only firestore --project demo-stockseguro \"node src/seed.js && node --watch src/server.js\"",
+    "backup": "node src/backup/cli.js",
+    "seed": "node src/seed.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/firestore.js && node --check src/inventory.js && node --check src/github.js && node --check src/seed.js && node --check src/backup/serialize.js && node --check src/backup/store.js && node --check src/backup/dump.js && node --check src/backup/restore.js && node --check src/backup/engine.js && node --check src/backup/cli.js && node --check public/app.js",
+    "test": "firebase emulators:exec --only firestore --project demo-stockseguro \"node --test --test-concurrency=1 test/backup.test.js test/api.test.js\""
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "firebase-admin": "^13.0.0",
+    "helmet": "^8.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.0.0"
+  }
+}

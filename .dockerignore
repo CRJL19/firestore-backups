@@ -1,0 +1,11 @@
+**/node_modules
+.git
+.github
+docs
+*.md
+.env
+.env.*
+*-firebase-adminsdk-*.json
+serviceAccount*.json
+*.log
+backups

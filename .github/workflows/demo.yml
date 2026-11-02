@@ -1,0 +1,52 @@
+# Operaciones de demostración: cargar datos y simular un desastre en producción.
+#
+# Secret: FIREBASE_RESTORE_SA (cuenta con escritura).
+name: Operaciones de demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: seed carga datos si la base está vacía; disaster la vacía
+        type: choice
+        options: [seed, disaster]
+        default: seed
+      confirm:
+        description: Para disaster, escribe DESASTRE
+        required: false
+        type: string
+
+concurrency:
+  group: backups
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    name: Ejecutar la operación
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_RESTORE_SA }}
+      ACTION: ${{ inputs.action }}
+      CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci --omit=dev
+
+      - name: Ejecutar
+        run: |
+          if [ "$ACTION" = "seed" ]; then
+            node src/seed.js
+          else
+            node src/backup/cli.js wipe --confirm "$CONFIRM"
+          fi

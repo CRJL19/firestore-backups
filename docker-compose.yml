@@ -1,0 +1,23 @@
+# Entorno local completo sin instalar Java: el emulador de Firestore y la app.
+services:
+  firestore:
+    build:
+      context: .
+      dockerfile: docker/emulator.Dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8080/"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    environment:
+      FIRESTORE_EMULATOR_HOST: firestore:8080
+      GCLOUD_PROJECT: demo-stockseguro
+      EDIT_KEY: dev-key
+    ports:
+      - "3000:3000"
+    depends_on:
+      firestore:
+        condition: service_healthy

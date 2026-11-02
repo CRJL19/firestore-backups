@@ -1,0 +1,22 @@
+node_modules/
+
+# Credenciales: la cuenta de servicio da acceso total a la base de datos.
+.env
+.env.*
+*-firebase-adminsdk-*.json
+serviceAccount*.json
+
+# Emulador
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebase/
+*.log
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Copias de seguridad locales
+backups/

@@ -1,0 +1,22 @@
+# Infraestructura como código de Render (Blueprint).
+services:
+  - type: web
+    name: stockseguro-firestore
+    runtime: docker
+    plan: free
+    branch: main
+    # El despliegue lo dispara GitHub Actions, y solo si pasan las pruebas.
+    autoDeploy: false
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Render genera la clave al crear el servicio: la ves en Environment.
+      - key: EDIT_KEY
+        generateValue: true
+      # Repositorio cuyas copias muestra el panel, con formato usuario/repositorio.
+      - key: BACKUPS_REPOSITORY
+        sync: false
+      # sync: false -> Render la pide al crear el servicio y nunca vive en el repositorio.
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false

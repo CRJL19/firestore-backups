@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StockSeguro · Inventario con copias verificadas</title>
+  <meta name="description" content="Inventario sobre Firestore con copias de seguridad automáticas, cifradas y verificadas." />
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">StockSeguro</span>
+    <span class="tagline">Inventario sobre Firestore con copias verificadas</span>
+  </header>
+
+  <main class="container">
+    <section class="card" aria-labelledby="backups-title">
+      <div class="head">
+        <h1 id="backups-title">Copias de seguridad</h1>
+        <span id="backup-status" class="badge">Cargando…</span>
+      </div>
+      <p id="backup-summary" class="muted"></p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Copia</th><th>Tipo</th><th>Tamaño</th><th>Fecha</th><th>Caduca</th></tr></thead>
+          <tbody id="backup-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="products-title">
+      <div class="head">
+        <h2 id="products-title">Inventario</h2>
+        <span id="product-count" class="muted"></span>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Producto</th><th>SKU</th><th>Stock</th><th>Movimientos</th><th>Actualizado</th><th><span class="sr">Acciones</span></th></tr></thead>
+          <tbody id="product-rows"><tr><td colspan="6" class="muted">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="edit-title">
+      <h2 id="edit-title">Modificar datos</h2>
+      <p class="muted">Cualquiera puede mirar. Para escribir hace falta la clave de edición, que se guarda solo en esta pestaña.</p>
+      <label for="edit-key">Clave de edición</label>
+      <input id="edit-key" type="password" autocomplete="off" />
+
+      <form id="product-form" class="grid">
+        <div><label for="name">Nombre</label><input id="name" maxlength="80" required /></div>
+        <div><label for="sku">SKU</label><input id="sku" maxlength="30" required /></div>
+        <div><label for="stock">Stock inicial</label><input id="stock" type="number" min="0" step="1" value="0" required /></div>
+        <div><label for="supplier">Proveedor</label><select id="supplier"><option value="">Sin proveedor</option></select></div>
+        <button type="submit" class="primary">Agregar producto</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript>Esta aplicación necesita JavaScript.</noscript>
+</body>
+</html>

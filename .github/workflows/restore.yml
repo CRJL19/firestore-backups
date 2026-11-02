@@ -1,0 +1,87 @@
+# Restauración en producción, siempre manual y con una copia previa de seguridad.
+#
+# Secrets: FIREBASE_RESTORE_SA (cuenta con escritura) y BACKUP_KEY.
+name: Restaurar copia
+
+on:
+  workflow_dispatch:
+    inputs:
+      backup_id:
+        description: ID de la copia (sin el prefijo backup-)
+        required: true
+        type: string
+      mode:
+        description: replace deja la base igual que la copia; merge conserva el resto
+        type: choice
+        options: [replace, merge]
+        default: replace
+      only:
+        description: 'Opcional: restaurar solo esta ruta, por ejemplo products/abc123'
+        required: false
+        type: string
+      confirm:
+        description: Escribe RESTAURAR para confirmar
+        required: true
+        type: string
+
+concurrency:
+  group: backups
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  restore:
+    name: Restaurar en producción
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_RESTORE_SA }}
+      BACKUP_ID: ${{ inputs.backup_id }}
+      RESTORE_MODE: ${{ inputs.mode }}
+      RESTORE_ONLY: ${{ inputs.only }}
+      CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - name: Comprobar la confirmación
+        run: |
+          if [ "$CONFIRM" != "RESTAURAR" ]; then
+            echo "::error::Escribe RESTAURAR para confirmar."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Descargar las copias
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/fetch-backups.sh backups
+
+      # Si la restauración fue un error, esta copia permite deshacerla.
+      - name: Copia del estado actual
+        id: safety
+        run: node src/backup/cli.js create --dir backups --type full --label prerestore
+
+      - name: Guardar la copia previa
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-${{ steps.safety.outputs.id }}
+          path: backups/${{ steps.safety.outputs.id }}/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Restaurar
+        run: |
+          args=(restore --dir backups --id "$BACKUP_ID" --mode "$RESTORE_MODE" --confirm RESTAURAR)
+          if [ -n "$RESTORE_ONLY" ]; then args+=(--only "$RESTORE_ONLY"); fi
+          node src/backup/cli.js "${args[@]}"

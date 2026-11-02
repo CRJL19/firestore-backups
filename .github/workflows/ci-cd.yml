@@ -1,0 +1,80 @@
+# CI/CD: pruebas contra el emulador -> imagen Docker -> despliegue en Render.
+#
+# Secret requerido para desplegar: RENDER_DEPLOY_HOOK
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Pruebas (emulador de Firestore)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      # El emulador de Firestore es un JAR: necesita Java.
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar sintaxis
+        run: npm run check
+
+      - name: Pruebas de integración
+        run: npm test
+
+  docker:
+    name: Imagen Docker
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Construir la imagen de producción
+        run: docker build -t stockseguro:${{ github.sha }} .
+
+  deploy:
+    name: Desplegar en Render
+    needs: [test, docker]
+    # Nunca desde un pull request.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+    steps:
+      - name: Disparar el Deploy Hook
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "::error::Falta el secret RENDER_DEPLOY_HOOK."
+            exit 1
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$RENDER_DEPLOY_HOOK")
+          echo "Render respondió HTTP $code"
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            echo "::error::Render rechazó el Deploy Hook (HTTP $code)."
+            exit 1
+          fi
+          echo "### Despliegue disparado para \`${GITHUB_SHA::7}\`" >> "$GITHUB_STEP_SUMMARY"
