@@ -140,11 +140,13 @@ En nuestra última ejecución tardó 38 s: 29 s las pruebas, 12 s la imagen y 2 
 | Copia completa | Firestore real | 27 documentos en 5,6 s |
 | Restauración de esa copia | Emulador en GitHub Actions | 27 documentos en 1,1 s, sin diferencias |
 | Ejecución completa del workflow | GitHub Actions | 33 s |
-| Simulacro: copias, base vaciada y restauración | Emulador | 25 documentos, los esperados |
+| Copias diarias programadas | GitHub Actions, del 2 al 12 de noviembre | 11 de 11 en verde |
+| Copia completa semanal | Automática | Creada sola el 9 de noviembre |
+| Simulacro: copias, base vaciada y restauración | Emulador local | 25 documentos en 237 ms, los esperados |
 
 ![Resumen de la copia verificada en GitHub Actions](https://raw.githubusercontent.com/CRJL19/firestore-backups/main/docs/capturas/02-copia-verificada.png)
 
-`[resultado del simulacro en producción]`
+El simulacro de desastre lo hicimos en el emulador local, con los mismos comandos del workflow. `restore.yml` está listo para producción, pero no lo ejecutamos para esta demostración.
 
 Con estos volúmenes el tiempo de recuperación son segundos, pero no lo extrapolaría. Lo valioso es que cada verificación lo mide, así que veríamos crecer esa cifra junto con los datos.
 
@@ -157,7 +159,7 @@ Con estos volúmenes el tiempo de recuperación son segundos, pero no lo extrapo
 ## Limitaciones
 
 - **Dos ubicaciones, no tres.** Hay datos en Firestore y copias en GitHub. La regla 3-2-1 pediría una tercera.
-- **Horario de GitHub.** Una tarea programada puede retrasarse, y GitHub las desactiva tras 60 días sin actividad en el repositorio. Por eso el panel avisa si la última copia supera las 26 horas.
+- **Horario de GitHub.** Una tarea programada puede retrasarse, y lo comprobamos: programada para las 08:00 UTC, la copia empezó cada día entre 6 y 10 horas tarde. Además, GitHub desactiva las tareas programadas tras 60 días sin actividad en el repositorio. Por eso el panel avisa si la última copia supera las 26 horas.
 - **Plan gratuito.** Firestore Spark permite 50 000 lecturas y 20 000 escrituras al día. La instancia de Render se duerme tras un rato sin tráfico.
 - **Escala.** Cada copia se procesa en memoria. Para millones de documentos, lo correcto sería la exportación nativa.
 

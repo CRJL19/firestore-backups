@@ -134,9 +134,9 @@ En producción, con Firestore real, la primera copia completa dio esto:
 
 ![Resumen de la copia verificada en GitHub Actions](https://raw.githubusercontent.com/CRJL19/firestore-backups/main/docs/capturas/02-copia-verificada.png)
 
-También simulamos un desastre en el emulador: una copia completa, cambios y un borrado, una incremental, la base vaciada y una restauración. Volvieron los 25 documentos esperados, sin el producto eliminado.
+Después dejamos el workflow funcionando solo. Del 2 al 12 de noviembre se ejecutó todos los días y guardó 12 copias, todas verificadas antes de guardarse: 2 completas, la segunda creada automáticamente al cumplirse los 7 días, y 10 incrementales. Cada incremental cifrada pesa unos 650 bytes, frente a 1,8 KB de una completa.
 
-`[resultado del simulacro en producción]`
+El simulacro de desastre lo hicimos en el emulador local, con los mismos comandos que usa GitHub Actions: una copia completa, un cambio de stock y un borrado, una incremental, la base vaciada y la restauración de la cadena. Volvieron los 25 documentos esperados en 237 ms, con el stock actualizado y sin el producto eliminado. En producción, la restauración existe como un workflow manual, pero no la ejecutamos para esta demostración.
 
 Un dato que me sorprendió: esa incremental, hecha segundos después de la completa, copió 26 registros frente a 27. No es un error. Cada incremental relee los últimos 5 minutos por seguridad, porque copiar de más es inofensivo y copiar de menos no lo es. El ahorro aparece cuando las copias están separadas por horas.
 
