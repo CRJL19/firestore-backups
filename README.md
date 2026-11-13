@@ -13,7 +13,7 @@ Proyecto de la actividad sobre **estrategias de copia de seguridad NoSQL**, Base
 |---|---|
 | Aplicación | <https://stockseguro-firestore.onrender.com> |
 | Repositorio | <https://github.com/CRJL19/firestore-backups> |
-| Video ||
+| Video |<https://youtu.be/56mY6DRLr8U>|
 
 ## Estrategias
 
