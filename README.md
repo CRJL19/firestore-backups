@@ -15,7 +15,7 @@ Proyecto de la actividad sobre **estrategias de copia de seguridad NoSQL**, Base
 | Repositorio | <https://github.com/CRJL19/firestore-backups> |
 | Video |<https://youtu.be/56mY6DRLr8U>|
 | Artículo Carlos | <https://dev.to/crjl11/copiar-una-base-nosql-no-es-exportar-json-lo-que-aprendimos-haciendo-backups-de-firestore-n5p> |
-| Artículo Arturo | `[PENDIENTE]` |
+| Artículo Arturo | <https://dev.to/arturo_sebastiancutipaf/una-copia-que-nadie-restauro-no-es-una-copia-backups-de-firestore-verificados-con-github-actions-24eg> |
 
 ## Estrategias
 
